@@ -35,7 +35,7 @@ export const extractEntries = (textItems) => {
             items.push({ date: items[items.length - 1].date, description: '' })
             i += 2
         } else if (textItems[i].str.trim().length > 0) {
-            if (/^[A-Z][a-z]{2} [0-9]{1,2}$/.test(textItems[i].str) && dateOffset4 == textItems[i].transform[4]) {
+            if (/^[A-Z][a-z]{2} [0-9]{1,2}$/.test(textItems[i].str) && dateOffset4 <= textItems[i].transform[4] + 20) {
                 items[items.length - 1].date = dateFromText(textItems[i].str)
             } else {
                 items[items.length - 1].description = `${items[items.length - 1].description} ${textItems[i].str}`
