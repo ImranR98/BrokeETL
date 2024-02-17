@@ -10,7 +10,6 @@ const filters = [
     { string: 'Service Charge', category: 'Necessity' },
     { string: 'Banking Fee', category: 'Necessity' },
     { string: 'Plan Fee', category: 'Necessity' },
-    { string: 'SMART STUDENT OFFER', category: 'Other Money In' },
     { string: 'Overdraft', category: 'Other Extra Expense' }
 ]
 
