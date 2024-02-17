@@ -2,7 +2,7 @@ import fs from 'fs'
 import * as pdfjs from 'pdfjs-dist'
 
 const extractTextFromPDF = async (pdfPath) => {
-    const pdf = await pdfjs.getDocument(pdfPath).promise
+    const pdf = await pdfjs.getDocument({ url: pdfPath, verbosity: 0 }).promise
     let textItems = []
     async function getTextFromPage(pageNum) {
         const page = await pdf.getPage(pageNum)
@@ -17,7 +17,7 @@ const extractTextFromPDF = async (pdfPath) => {
     return textItems
 }
 
-const availableBankModules = fs.readdirSync('./bank_modules').filter(f => f.endsWith('.js')).map(f => f.slice(0,-3))
+const availableBankModules = fs.readdirSync('./bank_modules').filter(f => f.endsWith('.js')).map(f => f.slice(0, -3))
 
 const usage = (exitCode = 0) => {
     console.log(

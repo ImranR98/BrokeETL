@@ -6,7 +6,7 @@ export const extractEntries = (textItems) => {
     const finalItems = []
     for (let i = 0; i < textItems.length; i++) {
         if (/^[A-Z][a-z]{2} [0-9]{2}$/.test(textItems[i].str)) {
-            const date = new Date(textItems[i].str + ' ' + new Date().getFullYear())
+            const date = new Date(textItems[i].str + ' ' + new Date().getFullYear()) // TODO: BUG: GRAB ACTUAL YEAR FROM STATEMENT
             i += 2
             let description = ''
             while (textItems[i].str.trim().length > 0) {
