@@ -1,4 +1,5 @@
 export const extractEntries = (textItems) => {
+    const year = textItems.filter(t => /^For the period ending .+/.test(t.str))[0].str.slice(-4)
     textItems = textItems.slice(
         textItems.findIndex(t => t.str.indexOf('Opening balance') >= 0) + 4,
         textItems.findIndex(t => t.str.indexOf('Closing totals') >= 0) - 2
@@ -6,7 +7,7 @@ export const extractEntries = (textItems) => {
     const finalItems = []
     for (let i = 0; i < textItems.length; i++) {
         if (/^[A-Z][a-z]{2} [0-9]{2}$/.test(textItems[i].str)) {
-            const date = new Date(textItems[i].str + ' ' + new Date().getFullYear()) // TODO: BUG: GRAB ACTUAL YEAR FROM STATEMENT
+            const date = new Date(`${textItems[i].str} ${year}`)
             i += 2
             let description = ''
             while (textItems[i].str.trim().length > 0) {
