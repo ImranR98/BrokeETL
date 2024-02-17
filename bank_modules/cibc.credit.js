@@ -1,10 +1,13 @@
 export const extractEntries = (textItems) => {
-    const year = textItems[textItems.findIndex(t => t.str.indexOf('statement period') > 0) + 4].str.slice(-4)
+    textItems = textItems.filter(t => t.str.trim().length > 0)
+    let year = textItems[textItems.findIndex(t => t.str.indexOf('statement period') > 0) + 4].str.slice(-4)
+    if (!/^[0-9]{4}$/.test(year)) {
+        year = textItems[textItems.findIndex(t => t.str.indexOf('statement period') > 0) + 2].str.slice(-4)
+    }
     textItems = textItems.slice(
         textItems.findIndex(t => t.str.startsWith('Card number ')) + 1,
         textItems.findIndex(t => t.str.startsWith('Total for'))
     )
-    textItems = textItems.filter(t => t.str.trim().length > 0)
     const finalItems = []
     const isDate = (str) => /^[A-Z][a-z]{2} [0-9]{1,2}$/.test(str)
     for (let i = 0; i < textItems.length; i++) {
