@@ -6,7 +6,7 @@ export const extractEntries = (textItems) => {
     )
     const getAmtIfAmt = (str) => {
         let strA = str.split(',').join('')
-        if (/^[0-9]+\.[0-9]{2}$/.test(strA)) {
+        if (/^-?[0-9]+\.[0-9]{2}$/.test(strA)) {
             return parseFloat(strA)
         }
         return null
