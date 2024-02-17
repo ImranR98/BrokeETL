@@ -25,10 +25,10 @@ export const extractEntries = (textItems) => {
         }
         let possibleAmt = getAmtIfAmt(textItems[i].str)
         if (
-            possibleAmt &&
+            possibleAmt !== null &&
             i + 2 < textItems.length &&
             textItems[i + 1].str.trim().length == 0 &&
-            getAmtIfAmt(textItems[i + 2].str)
+            getAmtIfAmt(textItems[i + 2].str) !== null
         ) {
             items[items.length - 1].amount = possibleAmt * (textItems[i + 1].width > 100 ? -1 : 1)
             items[items.length - 1].description = items[items.length - 1].description.trim()

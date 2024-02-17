@@ -6,7 +6,8 @@ const filters = [
     'Interest',
     'Service Charge',
     'Banking Fee',
-    'SMART STUDENT OFFER'
+    'SMART STUDENT OFFER',
+    'Overdraft'
 ]
 
 let items = []
