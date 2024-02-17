@@ -10,7 +10,8 @@ const filters = [
     { string: 'Service Charge', category: 'Necessity' },
     { string: 'Banking Fee', category: 'Necessity' },
     { string: 'Plan Fee', category: 'Necessity' },
-    { string: 'Overdraft', category: 'Other Extra Expense' }
+    { string: 'Overdraft', category: 'Other Extra Expense' },
+    { string: 'Adjustment', category: 'Necessity' }
 ]
 
 let items = []
@@ -48,5 +49,5 @@ const twoDigitInt = (int) => {
 }
 
 finalItems.forEach(item => {
-    console.log(`${item.date.getFullYear()}-${twoDigitInt(item.date.getMonth()+1)}-${twoDigitInt(item.date.getDate())}\t${item.description}\t${item.amount < 0 ? `\t${item.amount * -1}` : `${item.amount}\t`}\t${item.category}`)
+    console.log(`${item.date.getFullYear()}-${twoDigitInt(item.date.getMonth()+1)}-${twoDigitInt(item.date.getDate())}\t${item.description}\t${item.amount < 0 ? `\t${item.amount * -1}` : `${item.amount}\t`}\t\t${item.category}`)
 })
