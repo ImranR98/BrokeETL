@@ -13,7 +13,8 @@ const filters = [
     { string: 'Overdraft', category: 'Other Extra Expense' },
     { string: 'Adjustment', category: 'Necessity' },
     { string: 'INTERAC E-TRANSFER FEE, CANCELLATION', category: 'Other Extra Expense' },
-    { string: 'Wire Payment Fee', category: 'Necessity' }
+    { string: 'Wire Payment Fee', category: 'Necessity' },
+    { string: 'CASH ADVANCE', category: 'Necessity' }
 ]
 
 let items = []
