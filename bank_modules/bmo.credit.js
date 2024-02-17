@@ -43,7 +43,6 @@ const extractEntries2023 = (textItems) => {
         textItems.findIndex(t => t.str.indexOf('Transactions since your last statement') >= 0) + 20,
         textItems.findIndex(t => t.str.startsWith('Subtotal for '))
     )
-    // console.log(JSON.stringify(textItems, null, '    '))
     textItems = textItems.filter(t => t.str.trim().length > 0)
     const finalItems = []
     const isDate = (str) => /^[A-Z][a-z]+\. [0-9]{1,2}$/.test(str)
