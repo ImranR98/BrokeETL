@@ -17,7 +17,7 @@ const extractTextFromPDF = async (pdfPath) => {
     return textItems
 }
 
-const availableBankModules = fs.readdirSync('./bank_modules').filter(f => f.endsWith('.js')).map(f => f.slice(0, -3))
+const availableBankModules = fs.readdirSync(`${__dirname}/bank_modules`).filter(f => f.endsWith('.js')).map(f => f.slice(0, -3))
 
 const usage = (exitCode = 0) => {
     console.log(
@@ -59,7 +59,7 @@ if (ORGANIZE_TARGET) {
 const bankModules = {}
 
 for (let i = 0; i < availableBankModules.length; i++) {
-    bankModules[availableBankModules[i]] = await import(`./bank_modules/${availableBankModules[i]}.js`)
+    bankModules[availableBankModules[i]] = await import(`${__dirname}/bank_modules/${availableBankModules[i]}.js`)
 }
 
 
