@@ -21,13 +21,14 @@ const availableBankModules = fs.readdirSync('./bank_modules').filter(f => f.ends
 
 const usage = (exitCode = 0) => {
     console.log(
-        `Usage: ${process.argv[0].split('/').pop()} ${process.argv[1].split('/').pop()} [-h] FILE/DIR [FILE/DIR ...]
+        `Usage: ${process.argv[0].split('/').pop()} ${process.argv[1].split('/').pop()} [-h] [-o OUTPUT_DIR] FILE/DIR [FILE/DIR ...]
 
 Description:
     Parse transactions from supported bank statement PDFs into a JSON array.
 
 Options:
     -h                         Show this help message and exit.
+    -o                         Reorganize input files by moving them into a specified output directory
   
 Arguments:    
     FILE/DIR                 The path to a PDF file or directory in which to search (recursively) for PDF files.
@@ -39,8 +40,20 @@ Arguments:
     }
 }
 
-if (process.argv[2] == '-h') {
+let argi = 2
+
+if (process.argv[argi] == '-h') {
     usage()
+}
+
+const ORGANIZE_TARGET = process.argv[argi] == '-o' ? process.argv[argi + 1] : null
+
+if (ORGANIZE_TARGET) {
+    argi += 2
+    if (fs.existsSync(ORGANIZE_TARGET) && !fs.statSync(ORGANIZE_TARGET).isDirectory()) {
+        console.error('Invalid -o directory!')
+        usage(1)
+    }
 }
 
 const bankModules = {}
@@ -50,7 +63,7 @@ for (let i = 0; i < availableBankModules.length; i++) {
 }
 
 
-const pathArgs = process.argv.slice(2)
+const pathArgs = process.argv.slice(argi)
 if (pathArgs.length == 0) {
     console.error('No files/dirs specified!\n')
     usage(1)
@@ -84,6 +97,13 @@ const getTargetFilesFromArg = (pathArg) => {
 const files = []
 pathArgs.forEach(a => files.push.apply(files, getTargetFilesFromArg(a)))
 
+const formatDate = (date) => {
+    const year = date.getFullYear()
+    const month = String(date.getMonth() + 1).padStart(2, '0')
+    const day = String(date.getDate()).padStart(2, '0')
+    return `${year}-${month}-${day}`
+}
+
 const entries = []
 for (let i = 0; i < files.length; i++) {
     try {
@@ -102,6 +122,17 @@ for (let i = 0; i < files.length; i++) {
                 e.account = fileValidatedInfo.account
                 return e
             }))
+            if (ORGANIZE_TARGET) {
+                const targetDir = `${ORGANIZE_TARGET}/${fileValidatedInfo.bank.split(' ').join('-')}/${fileValidatedInfo.account.split(' ').join('-')}`
+                if (!fs.existsSync(targetDir)) {
+                    fs.mkdirSync(targetDir, { recursive: true })
+                }
+                const fn = `${`${fileValidatedInfo.bank}_${fileValidatedInfo.account}`.split(' ').join('-')}_${formatDate(fileValidatedInfo.date)}.pdf`
+                fs.cpSync(files[i], `${targetDir}/${fn}`)
+                fs.unlinkSync(files[i])
+            }
+        } else {
+            console.error(`Did not recognize PDF (skipped): ${files[i]}`)
         }
     } catch (e) {
         console.error(files[i])
