@@ -45,3 +45,27 @@ export const extractEntries = (textItems) => {
     }
     return finalItems
 }
+
+export const validateFile = (textItems) => {
+    if (textItems.filter(t => /CIBC .+Card/.test(t.str)).length == 0) {
+        return null
+    }
+    let accItem = textItems.filter(t => t.str.indexOf('Total for ') >= 0)[0]
+    if (!accItem) {
+        accItem = textItems.findIndex(t => t.str.indexOf('Total for') >= 0)
+        if (accItem < 0) {
+            return null
+        }
+        accItem = textItems[accItem + 2]
+    }
+    let perIndMinusSome = textItems.findIndex(t => t.str.indexOf('statement period') >= 0)
+    let perStrRaw = textItems[perIndMinusSome + 4].str
+    if (perStrRaw.trim().length == 0) {
+        perStrRaw = textItems[perIndMinusSome + 7].str
+    }
+    return {
+        bank: 'CIBC',
+        account: 'Credit Card ' + accItem.str.slice(-4),
+        date: new Date(perStrRaw.slice(3))
+    }
+}

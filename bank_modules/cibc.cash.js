@@ -1,9 +1,13 @@
 export const extractEntries = (textItems) => {
     const year = textItems.filter(t => /For [A-Z][a-z]{2} [0-9]{1,2} to [A-Z][a-z]{2} [0-9]{1,2}, [0-9]{4}/.test(t.str))[0].str.slice(-4)
+    if (textItems[textItems.findIndex(t => t.str == 'Opening balance') + 3].str == 'Closing balance') {
+        return []
+    }
     textItems = textItems.slice(
         textItems.findIndex(t => t.str == 'Opening balance') + 4,
         textItems.findIndex(t => t.str == 'Closing balance')
     )
+    
     const getAmtIfAmt = (str) => {
         let strA = str.split(',').join('')
         if (/^-?[0-9]+\.[0-9]{2}$/.test(strA)) {
@@ -44,4 +48,20 @@ export const extractEntries = (textItems) => {
     }
     items.pop()
     return items
+}
+
+export const validateFile = (textItems) => {
+    if (textItems.filter(t => t.str.indexOf('CIBC Account Statement') >= 0).length == 0) {
+        return null
+    }
+    const accItemIndMinus2 = textItems.findIndex(t => t.str.indexOf('Account number:') >= 0)
+    if (accItemIndMinus2 < 0) {
+        return null
+    }
+    const rawPeriod = textItems[textItems.findIndex(t => /For .+ to .+, [0-9]{4}/.test(t.str))].str
+    return {
+        bank: 'CIBC',
+        account: 'Account ' + textItems[accItemIndMinus2 + 2].str,
+        date: new Date(rawPeriod.slice(rawPeriod.indexOf(' to ') + 4))
+    }
 }

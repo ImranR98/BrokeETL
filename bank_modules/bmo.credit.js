@@ -70,3 +70,22 @@ const extractEntries2023 = (textItems) => {
     }
     return finalItems
 }
+
+export const validateFile = (textItems) => {
+    if (textItems.filter(t => t.str.indexOf(' BMO ') >= 0).length == 0) {
+        return null
+    }
+    if (textItems.filter(t => t.str.toLowerCase().indexOf('credit card') >= 0).length == 0) {
+        return null
+    }
+    const accItemIndMinus2 = textItems.findIndex(t => t.str.toLowerCase().indexOf('card number') >= 0)
+    if (accItemIndMinus2 < 0) {
+        return null
+    }
+    const perIndMinus2 = textItems.findIndex(t => t.str.toLowerCase().indexOf('statement date') >= 0)
+    return {
+        bank: 'BMO',
+        account: 'Credit Card ' + textItems[accItemIndMinus2 + 2].str.slice(-4),
+        date: new Date(textItems[perIndMinus2 + 2].str)
+    }
+}

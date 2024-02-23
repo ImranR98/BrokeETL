@@ -21,18 +21,15 @@ const availableBankModules = fs.readdirSync('./bank_modules').filter(f => f.ends
 
 const usage = (exitCode = 0) => {
     console.log(
-        `Usage: ${process.argv[0].split('/').pop()} ${process.argv[1].split('/').pop()} [-h] BANK_MODULE FILE/DIR [FILE/DIR ...]
+        `Usage: ${process.argv[0].split('/').pop()} ${process.argv[1].split('/').pop()} [-h] FILE/DIR [FILE/DIR ...]
 
 Description:
-    Parse transactions from bank statement PDFs into a JSON array.
+    Parse transactions from supported bank statement PDFs into a JSON array.
 
 Options:
     -h                         Show this help message and exit.
   
-Arguments:
-    BANK_MODULE              The bank module to use.
-                             Allowed values: ${availableBankModules.join(', ')}
-    
+Arguments:    
     FILE/DIR                 The path to a PDF file or directory in which to search (recursively) for PDF files.
                              You can specify more than one.
                              Results from all files are merged into one array, sorted by date.`
@@ -46,14 +43,14 @@ if (process.argv[2] == '-h') {
     usage()
 }
 
-const bankModuleToUse = process.argv[2]
-if (!bankModuleToUse || availableBankModules.indexOf(`${bankModuleToUse}`) < 0) {
-    console.error('No/Invalid bank module specified!\n')
-    usage(1)
-}
-const bank = await import(`./bank_modules/${bankModuleToUse}.js`)
+const bankModules = {}
 
-const pathArgs = process.argv.slice(3)
+for (let i = 0; i < availableBankModules.length; i++) {
+    bankModules[availableBankModules[i]] = await import(`./bank_modules/${availableBankModules[i]}.js`)
+}
+
+
+const pathArgs = process.argv.slice(2)
 if (pathArgs.length == 0) {
     console.error('No files/dirs specified!\n')
     usage(1)
@@ -75,7 +72,7 @@ const getTargetFilesFromArg = (pathArg) => {
                 if (fs.statSync(filePath).isDirectory()) {
                     procDir(filePath)
                 } else if (filePath.toLowerCase().endsWith('.pdf')) {
-                    files.push(`${pathArg}/${f}`)
+                    files.push(filePath)
                 }
             });
         }
@@ -89,7 +86,27 @@ pathArgs.forEach(a => files.push.apply(files, getTargetFilesFromArg(a)))
 
 const entries = []
 for (let i = 0; i < files.length; i++) {
-    entries.push.apply(entries, bank.extractEntries(await extractTextFromPDF(files[i])))
+    try {
+        const fileText = await extractTextFromPDF(files[i]);
+        let fileValidatedInfo = null
+        let j
+        for (j = 0; j < availableBankModules.length; j++) {
+            fileValidatedInfo = bankModules[availableBankModules[j]].validateFile(fileText)
+            if (fileValidatedInfo) {
+                break
+            }
+        }
+        if (fileValidatedInfo) {
+            entries.push.apply(entries, bankModules[availableBankModules[j]].extractEntries(fileText).map(e => {
+                e.bank = fileValidatedInfo.bank
+                e.account = fileValidatedInfo.account
+                return e
+            }))
+        }
+    } catch (e) {
+        console.error(files[i])
+        throw e
+    }
 }
 entries.sort((a, b) => a.date - b.date)
 

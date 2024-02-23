@@ -23,3 +23,20 @@ export const extractEntries = (textItems) => {
     }
     return finalItems
 }
+
+export const validateFile = (textItems) => {
+    if (textItems.filter(t => t.str.indexOf('BMO Financial Group') >= 0).length == 0) {
+        return null
+    }
+    const accItem = textItems.filter(t => t.str.indexOf(' Account # ') >= 0)[0]
+    if (!accItem) {
+        return null
+    }
+    const tempI = accItem.str.indexOf(' Account # ')
+    const datePref = 'For the period ending '
+    return {
+        bank: 'BMO',
+        account: `Account ${accItem.str.slice(tempI + 11)} (${accItem.str.slice(0, tempI)})`,
+        date: new Date(textItems.filter(t => t.str.indexOf(datePref) >= 0)[0].str.slice(datePref.length))
+    }
+}
